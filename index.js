@@ -16,6 +16,13 @@ const imports = {
             sockets[id]['pointers'][wasmModule.exports.__getString(event).toLowerCase().trim()] = wasmModule.exports.table.get(pointer)
 
         },
+        sendMessagePointer: (id, pointer) => {
+
+            if (!sockets[id]) return
+
+            sockets[id]['pointers']['data'] = wasmModule.exports.table.get(pointer)
+
+        },
         initWS: () => {
 
             sockets.push({
@@ -24,9 +31,11 @@ const imports = {
                     error: null,
                     listening: null,
                     connect: null,
-                    close: null
+                    close: null,
+                    data: null
                 },
                 socket: new ws('ws://multisnakegame.loca.lt'),
+                // ws://multisnakegame.loca.lt
                 cache: [],
                 ready: false
             })
@@ -36,7 +45,7 @@ const imports = {
             let socket = sockets[id]
 
             // Handle messages before ready (b/c closures) :P
-            socket.socket.onopen = () => {
+            socket.socket.on('open', () => {
 
                 socket.ready = true
 
@@ -45,15 +54,31 @@ const imports = {
                     socket.socket.send(message)
                     
                 }
-            }
 
-            socket.socket.onmessage = (data, info) => {
+            })
+
+            socket.socket.on('message', (data, info) => {
 
                 const func = socket.pointers['message']
 
+                const funcMsg = socket.pointers['data']
+
                 if (typeof func === 'function') func(wasmModule.exports.__newString(data))
 
-            }
+                if (typeof funcMsg === 'function') {
+
+                    const context = data.split(':')
+                    // We have to use : to separate because AS-WS only supports strings
+            
+                    const fromUser = context[1]
+            
+                    const content = context[2]
+
+                    funcMsg(wasmModule.exports.__newString(content), wasmModule.exports.__newString(fromUser))
+
+                }
+
+            })
 
             socket.socket.onopen = () => {
             
@@ -94,13 +119,13 @@ const imports = {
 
             if (sockets[id].ready === false) {
                 
-                sockets[id].cache.push(wasmModule.exports.__getArray(message))
+                sockets[id].cache.push(Buffer.from(wasmModule.exports.__getArray(message)).toString())
 
                 return
                 
             }
 
-            sockets[id]['socket'].send(wasmModule.exports.__getArray(message))
+            sockets[id]['socket'].send(Buffer.from(wasmModule.exports.__getArray(message)).toString())
 
             return
 
@@ -110,7 +135,53 @@ const imports = {
             sockets[id]['socket'].close(number)
 
         }
+    },
+    console: {
+        consoleDebug: (message) => {
+
+            console.debug(wasmModule.exports.__getString(message))
+
+        },
+        consoleError: (message) => {
+
+            console.error(wasmModule.exports.__getString(message))
+
+        },
+        consoleInfo: (message) => {
+
+            console.info(wasmModule.exports.__getString(message))
+
+        },
+        consoleTime: (label) => {
+
+            console.time(wasmModule.exports.__getString(label))
+
+        },
+        consoleTimeEnd: (label) => {
+
+            console.timeEnd(wasmModule.exports.__getString(label))
+
+        },
+        consoleTimeLog: (label) => {
+
+            console.timeLog(wasmModule.exports.__getString(label))
+
+        },
+        consoleWarn: (message) => {
+
+            console.warn(wasmModule.exports.__getString(message))
+
+        },
+        consoleLog: (message) => {
+
+            console.log(wasmModule.exports.__getString(message))
+
+        }
     }
 };
+
 const wasmModule = loader.instantiateSync(fs.readFileSync(__dirname + "/build/optimized.wasm"), imports);
+
 module.exports = wasmModule.exports;
+
+wasmModule.exports.test()

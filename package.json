@@ -3,8 +3,8 @@
     "assemblyscript": "^0.18.21"
   },
   "scripts": {
-    "asbuild:untouched": "asc assembly/index.ts --target debug",
-    "asbuild:optimized": "asc assembly/index.ts --target release",
+    "asbuild:untouched": "asc assembly/index.ts --target debug --exportTable --exportRuntime",
+    "asbuild:optimized": "asc assembly/index.ts --target release --exportTable --exportRuntime",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
     "test": "node tests"
   },

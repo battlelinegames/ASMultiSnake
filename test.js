@@ -1,0 +1,1 @@
+new WebSocket('ws://multisnakegame.loca.lt:3000').onopen = () => { console.log('ready!') }

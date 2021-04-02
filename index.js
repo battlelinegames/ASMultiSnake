@@ -3,7 +3,7 @@ const loader = require("@assemblyscript/loader");
 
 let sockets = []
 
-const ws = require('ws')
+const ws = require('isomorphic-ws')
 
 // const ws = WebSocket for browser usage
 
@@ -34,7 +34,7 @@ const imports = {
                     close: null,
                     data: null
                 },
-                socket: new ws('ws://multisnakegame.loca.lt'),
+                socket: new ws('ws://multisnakegame.loca.lt:3000'),
                 // ws://multisnakegame.loca.lt
                 cache: [],
                 ready: false
@@ -44,9 +44,23 @@ const imports = {
 
             let socket = sockets[id]
 
+            socket.socket.onopen = () => {
+
+                console.log('ready!')
+                socket.ready = true
+
+                for (const message of socket.cache) {
+
+                    socket.socket.send(message)
+                    
+                }
+
+            }
+
             // Handle messages before ready (b/c closures) :P
             socket.socket.on('open', () => {
 
+                console.log('ready!')
                 socket.ready = true
 
                 for (const message of socket.cache) {
@@ -57,7 +71,7 @@ const imports = {
 
             })
 
-            socket.socket.on('message', (data, info) => {
+            socket.socket.onmessage = function incoming({ data }) {
 
                 const func = socket.pointers['message']
 
@@ -78,9 +92,9 @@ const imports = {
 
                 }
 
-            })
+            }
 
-            socket.socket.onopen = () => {
+            socket.socket.onopen = function () {
             
                 const func = socket.pointers['listening']
 
@@ -88,7 +102,7 @@ const imports = {
 
             }
 
-            socket.socket.onclose = () => {
+            socket.socket.onclose = function () {
             
                 const func = socket.pointers['close']
 
@@ -96,7 +110,7 @@ const imports = {
 
             }
 
-            socket.socket.onerror = (err) => {
+            socket.socket.onerror = function (err) {
             
                 const func = socket.pointers['error']
 
@@ -104,7 +118,7 @@ const imports = {
 
             }
 
-            socket.socket.onopen = () => {
+            socket.socket.onopen = function () {
             
                 const func = socket.pointers['connect']
 

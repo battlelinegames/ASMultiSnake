@@ -25,13 +25,13 @@ server.on('listening', async () => {
     console.log('Setting up Peer2Peer')
 
     console.log('Tunneling with LocalTunnel.me')
-/*
+
     const tunnel = await localtunnel({
         port: 3000,
         subdomain: 'multisnakegame'
     })
 
-    console.log('Server Listening On: ', `${tunnel.url.replace('https://', 'wss://')}`)*/
+    console.log('Server Listening On: ', `${tunnel.url.replace('https://', 'wss://')}`)
 
 })
 

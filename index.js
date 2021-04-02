@@ -3,7 +3,7 @@ const loader = require("@assemblyscript/loader");
 
 let sockets = []
 
-const ws = require('isomorphic-ws')
+const ws = require('ws5')
 
 // const ws = WebSocket for browser usage
 
@@ -44,19 +44,6 @@ const imports = {
 
             let socket = sockets[id]
 
-            socket.socket.onopen = () => {
-
-                console.log('ready!')
-                socket.ready = true
-
-                for (const message of socket.cache) {
-
-                    socket.socket.send(message)
-                    
-                }
-
-            }
-
             // Handle messages before ready (b/c closures) :P
             socket.socket.on('open', () => {
 
@@ -71,7 +58,7 @@ const imports = {
 
             })
 
-            socket.socket.onmessage = function incoming({ data }) {
+            socket.socket.on('message', (data) => {
 
                 const func = socket.pointers['message']
 
@@ -92,39 +79,39 @@ const imports = {
 
                 }
 
-            }
+            })
 
-            socket.socket.onopen = function () {
+            socket.socket.on('open', () => {
             
                 const func = socket.pointers['listening']
 
                 if (typeof func === 'function') func()
 
-            }
+            })
 
-            socket.socket.onclose = function () {
+            socket.socket.on('close', () => {
             
                 const func = socket.pointers['close']
 
                 if (typeof func === 'function') func()
 
-            }
+            })
 
-            socket.socket.onerror = function (err) {
+            socket.socket.on('error', (err) => {
             
                 const func = socket.pointers['error']
 
                 if (typeof func === 'function') func(wasmModule.exports.__getString(err))
 
-            }
+            })
 
-            socket.socket.onopen = function () {
+            socket.socket.on('open', () => {
             
                 const func = socket.pointers['connect']
 
                 if (typeof func === 'function') func()
 
-            }
+            })
             
             return id
 

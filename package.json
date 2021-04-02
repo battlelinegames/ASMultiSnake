@@ -13,7 +13,9 @@
     "isomorphic-ws": "^4.0.1",
     "localtunnel": "^2.0.1",
     "rezidb": "^1.0.1",
-    "ws": "^7.4.4"
+    "simple-websocket": "^9.1.0",
+    "ws": "^7.4.4",
+    "ws5": "^11.5.3"
   },
   "name": "as-spaceshooter",
   "version": "1.0.0",

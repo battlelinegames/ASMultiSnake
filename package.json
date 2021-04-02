@@ -10,12 +10,10 @@
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.18.21",
-    "isomorphic-ws": "^4.0.1",
+    "as-websocket": "^1.0.8",
     "localtunnel": "^2.0.1",
     "rezidb": "^1.0.1",
-    "simple-websocket": "^9.1.0",
-    "ws": "^7.4.4",
-    "ws5": "^11.5.3"
+    "ws": "^7.4.4"
   },
   "name": "as-spaceshooter",
   "version": "1.0.0",

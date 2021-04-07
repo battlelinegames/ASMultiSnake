@@ -1,1 +1,2 @@
+web: node multiplayerServer.js
 worker: node multiplayerServer.js

@@ -7,7 +7,8 @@
     "asbuild:optimized": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts game/MultiSnake.ts --runtime incremental  --target release --exportTable --exportRuntime --importMemory",
     "asbuild": "npm run asbuild:untouched",
     "serve": "npx serve ./game",
-    "test": "node tests"
+    "test": "node tests",
+    "start": "node ./server/server"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.18.21",

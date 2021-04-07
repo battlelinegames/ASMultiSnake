@@ -86,7 +86,7 @@ export class MultiSnake {
 
 				log('From: ' + fromUser + 'Me: ' + username)
 
-				if (fromUser.startsWith(username)) {
+				if (!fromUser.startsWith(username)) {
 		
 					const content = context[2]
 
@@ -97,8 +97,19 @@ export class MultiSnake {
 					let direction = content.split('.')[1]
 
 					log('Moving Enemy: ' + direction)
-			
-					MultiSnake.SN.enemyShip.changeDirection(i32(parseInt(direction)))
+
+					if (direction === 'shoot') {
+						// Do something here
+						MultiSnake.SN.enemyShip
+					}
+					
+					if (direction !== 'shoot') {
+						
+						// Move!
+
+						MultiSnake.SN.enemyShip.changeDirection(i32(parseInt(direction)))
+
+					}
 
 				}
 		

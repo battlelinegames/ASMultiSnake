@@ -54,7 +54,7 @@ document.addEventListener('keydown', (event) => {
     }
     if (event.code === 'Space') {
         spaceKeyPress = true;
-        //sock.send(`room:player:direction.shoot`)
+        sock.send(`room:player:direction.shoot`)
     }
 
 });

@@ -8014,6 +8014,7 @@
   local.get $5
   i32.const 0
   call $~lib/string/String#startsWith
+  i32.eqz
   if
    global.get $~lib/memory/__stack_pointer
    local.get $1

@@ -104,14 +104,12 @@ export class MultiSnake {
 
 					if (direction === 'shoot') {
 						// Do something here
-						MultiSnake.SN.enemyShip
+						this.launchEnemyBullet()
 					}
 					
 					if (direction !== 'shoot') {
 						
 						// Move!
-
-						
 
 						MultiSnake.SN.enemyShip.changeDirection(i32(parseInt(direction)))
 

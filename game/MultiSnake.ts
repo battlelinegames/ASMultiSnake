@@ -44,6 +44,10 @@ export class MultiSnake {
 	public explosionIndex: i32 = 0;
 	public bulletIndex: i32 = 0;
 
+	public enemyBulletIndex: i32 = 0
+
+	public enemyBulletArray: Array<Bullet> = new Array<Bullet>()
+
 	// shot cooldown variables
 	static readonly LAUNCH_WAIT: i32 = 250;
 	public bulletCoolDown: i32 = 50;
@@ -107,6 +111,8 @@ export class MultiSnake {
 						
 						// Move!
 
+						
+
 						MultiSnake.SN.enemyShip.changeDirection(i32(parseInt(direction)))
 
 					}
@@ -159,6 +165,23 @@ export class MultiSnake {
 		}
 		this.bulletArray[this.bulletIndex].launch(MultiSnake.SN.playerShip.direction,
 			MultiSnake.SN.playerShip.position);
+	}
+
+	public launchEnemyBullet(): void {
+		let count: i32 = 0;
+		this.enemyBulletIndex++;
+		if (this.enemyBulletIndex >= this.enemyBulletArray.length) {
+			this.enemyBulletIndex = 0;
+		}
+		while (this.enemyBulletArray[this.enemyBulletIndex].visible == true) {
+			this.enemyBulletIndex++;
+			if (this.enemyBulletIndex >= this.enemyBulletArray.length) {
+				this.enemyBulletIndex = 0;
+			}
+			if (count++ > this.enemyBulletArray.length) return;
+		}
+		this.enemyBulletArray[this.enemyBulletIndex].launch(MultiSnake.SN.enemyShip.direction,
+			MultiSnake.SN.enemyShip.position);
 	}
 }
 

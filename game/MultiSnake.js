@@ -180,8 +180,8 @@ class Binding {
                             close: null,
                             data: null
                         },
-                        socket: new WebSocket('ws://localhost:3000'),
-                        // ws://localhost
+                        socket: new WebSocket('ws://as-space-snake.herokuapp.com'),
+                        // Change to ws://localhost:3000 if you want local.
                         cache: [],
                         ready: false
                     }

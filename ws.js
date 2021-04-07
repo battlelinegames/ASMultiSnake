@@ -30,8 +30,8 @@ module.exports = `
                     close: null,
                     data: null
                 },
-                socket: new ws('ws://multisnakegame.loca.lt:3000'),
-                // ws://multisnakegame.loca.lt
+                socket: new ws('ws://localhost:3000'),
+                // ws://localhost
                 cache: [],
                 ready: false
             })

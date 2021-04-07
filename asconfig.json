@@ -1,14 +1,14 @@
 {
   "targets": {
     "debug": {
-      "binaryFile": "build/untouched.wasm",
-      "textFile": "build/untouched.wat",
+      "binaryFile": "game/MultiSnake.wasm",
+      "textFile": "game/MultiSnake.wat",
       "sourceMap": true,
       "debug": true
     },
     "release": {
-      "binaryFile": "build/optimized.wasm",
-      "textFile": "build/optimized.wat",
+      "binaryFile": "game/MultiSnake.wasm",
+      "textFile": "game/MultiSnake.wat",
       "sourceMap": true,
       "optimizeLevel": 3,
       "shrinkLevel": 1,

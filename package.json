@@ -3,16 +3,19 @@
     "assemblyscript": "^0.18.21"
   },
   "scripts": {
-    "asbuild:untouched": "asc assembly/index.ts --target debug --exportTable --exportRuntime",
-    "asbuild:optimized": "asc assembly/index.ts --target release --exportTable --exportRuntime",
-    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized",
+    "asbuild:untouched": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts game/MultiSnake.ts --runtime incremental  --target debug --exportTable --exportRuntime --importMemory",
+    "asbuild:optimized": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts game/MultiSnake.ts --runtime incremental  --target release --exportTable --exportRuntime --importMemory",
+    "asbuild": "npm run asbuild:untouched",
+    "serve": "npx serve ./game",
     "test": "node tests"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.18.21",
-    "as-websocket": "^1.0.8",
+    "as-bind": "^0.6.1",
+    "as-websocket": "^1.0.9",
     "localtunnel": "^2.0.1",
     "rezidb": "^1.0.1",
+    "serve": "^11.3.2",
     "ws": "^7.4.4"
   },
   "name": "as-spaceshooter",

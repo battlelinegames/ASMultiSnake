@@ -1,9 +1,9 @@
+// NOTE: Edited the bindings to support a sort of wrapper. Has some new methods. 
 // JS Imports
-declare function sendWS(id: i32, data: Uint8Array): void
-declare function initWS(): i32
+declare function sendWS(id: i32, data: string): void
+declare function initWS(url: string): i32
 declare function closeWS(id: i32, number: number): void
 declare function sendPointer(id: number, event: string, pointer: i32): void
-declare function sendMessagePointer(id: number, pointer: i32): void
 
 // API
 export class WebSocket {
@@ -12,9 +12,9 @@ export class WebSocket {
 
   public username: string = ''
 
-  constructor() {
+  constructor(url: string) {
 
-    let id = initWS()
+    let id = initWS(url)
 
     this.id = id
 
@@ -24,17 +24,17 @@ export class WebSocket {
 
     this.username = username
 
-    sendWS(this.id, Uint8Array.wrap(String.UTF8.encode(`addclient:${this.username}`)))
+    sendWS(this.id, `addclient:${this.username}`)
 
   }
   sendMessage(data: string, toUser: string): void {
 
-    sendWS(this.id, Uint8Array.wrap(String.UTF8.encode(`${toUser}:${this.username}:${data}`)))
+    sendWS(this.id, `${toUser}:${this.username}:${data}`)
 
   }
   send(data: string): void {
 
-    sendWS(this.id, Uint8Array.wrap(String.UTF8.encode(data)))
+    sendWS(this.id, data)
 
   }
   close(number: number): void {
@@ -46,12 +46,6 @@ export class WebSocket {
   on(event: string, callback: (data: string) => void): void {
 
     sendPointer(this.id, event, load<i32>(changetype<usize>(callback)))
-    // NOTE: Does not call every time! Only calls once.
-  }
-
-  onMessage(callback: (message: string, from: string) => void): void {
-
-    sendMessagePointer(this.id, load<i32>(changetype<usize>(callback)))
     // NOTE: Does not call every time! Only calls once.
   }
   

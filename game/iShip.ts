@@ -19,6 +19,8 @@ export interface iShip {
 
 	move(): void;
 	draw(): void;
+	hitTestPoint(x: f32, y: f32): bool;
+	explode(): void;
 	shiftTrail(): void;
 	changeDirection(dir: DIRECTION): void;
 }

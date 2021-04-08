@@ -29,6 +29,53 @@ let socket: WebSocket = new WebSocket('ws://localhost:3000')
 
 let username: string = 'unknown'
 
+function timeoutCallback(): void {
+	username = prompt('Enter A Username');
+
+	socket.registerUsername(username);
+
+	socket.on('message', this.dataCallback);
+}
+
+function dataCallback(data: string): void {
+
+	const context = data.split(':')
+	// We have to use : to separate because AS-WS only supports strings
+
+	const fromUser = context[1]
+
+	log('From: ' + fromUser + 'Me: ' + username)
+
+	if (!fromUser.startsWith(username)) {
+
+		const content = context[2]
+
+		log('Content: ' + content)
+
+		if (!content) return
+
+		let direction = content.split('.')[1]
+
+		log('Moving Enemy: ' + direction)
+
+		if (direction === 'shoot') {
+			// Do something here
+			MultiSnake.SN.launchEnemyBullet()
+		}
+
+		if (direction !== 'shoot') {
+
+			// Move!
+
+			MultiSnake.SN.enemyShip.changeDirection(i32(parseInt(direction)))
+
+		}
+
+	}
+
+}
+
+
 export class MultiSnake {
 
 	// singleton
@@ -51,6 +98,8 @@ export class MultiSnake {
 	// shot cooldown variables
 	static readonly LAUNCH_WAIT: i32 = 250;
 	public bulletCoolDown: i32 = 50;
+
+
 
 	constructor() {
 
@@ -75,51 +124,7 @@ export class MultiSnake {
 			this.bulletArray.push(new Bullet());
 		}
 
-		setTimeout(() => {
-
-			username = prompt('Enter A Username')
-
-			socket.registerUsername(username)
-
-			socket.on('message', data => {
-
-				const context = data.split(':')
-				// We have to use : to separate because AS-WS only supports strings
-
-				const fromUser = context[1]
-
-				log('From: ' + fromUser + 'Me: ' + username)
-
-				if (!fromUser.startsWith(username)) {
-		
-					const content = context[2]
-
-					log('Content: ' + content)
-
-					if (!content) return
-
-					let direction = content.split('.')[1]
-
-					log('Moving Enemy: ' + direction)
-
-					if (direction === 'shoot') {
-						// Do something here
-						this.launchEnemyBullet()
-					}
-					
-					if (direction !== 'shoot') {
-						
-						// Move!
-
-						MultiSnake.SN.enemyShip.changeDirection(i32(parseInt(direction)))
-
-					}
-
-				}
-		
-			})
-			
-		}, 500)
+		setTimeout(timeoutCallback, 500)
 
 	}
 
@@ -188,33 +193,33 @@ new MultiSnake();
 var aiTime: f32 = 0.0;
 function RunAI(): void {
 	// Need to grab some WebSocket stuff...
-	
-/*
-	if (aiTime <= 0.0) {
-		aiTime = Mathf.random() * 2.0;
-		let choice = Mathf.random();
-		if (choice < 0.25 &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.RIGHT &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.LEFT) {
-			MultiSnake.SN.enemyShip.changeDirection(DIRECTION.LEFT);
-		}
-		else if (choice < 0.5 &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.RIGHT &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.LEFT) {
-			MultiSnake.SN.enemyShip.changeDirection(DIRECTION.RIGHT);
-		}
-		else if (choice < 0.75 &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.UP &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.DOWN) {
-			MultiSnake.SN.enemyShip.changeDirection(DIRECTION.UP);
-		}
-		else if (MultiSnake.SN.enemyShip.direction != DIRECTION.UP &&
-			MultiSnake.SN.enemyShip.direction != DIRECTION.DOWN) {
-			MultiSnake.SN.enemyShip.changeDirection(DIRECTION.DOWN);
-		}
-	}
 
-	aiTime -= Renderer.DELTA;*/
+	/*
+		if (aiTime <= 0.0) {
+			aiTime = Mathf.random() * 2.0;
+			let choice = Mathf.random();
+			if (choice < 0.25 &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.RIGHT &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.LEFT) {
+				MultiSnake.SN.enemyShip.changeDirection(DIRECTION.LEFT);
+			}
+			else if (choice < 0.5 &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.RIGHT &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.LEFT) {
+				MultiSnake.SN.enemyShip.changeDirection(DIRECTION.RIGHT);
+			}
+			else if (choice < 0.75 &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.UP &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.DOWN) {
+				MultiSnake.SN.enemyShip.changeDirection(DIRECTION.UP);
+			}
+			else if (MultiSnake.SN.enemyShip.direction != DIRECTION.UP &&
+				MultiSnake.SN.enemyShip.direction != DIRECTION.DOWN) {
+				MultiSnake.SN.enemyShip.changeDirection(DIRECTION.DOWN);
+			}
+		}
+	
+		aiTime -= Renderer.DELTA;*/
 }
 
 export function LoopCallback(delta_ms: i32,
@@ -245,7 +250,7 @@ export function LoopCallback(delta_ms: i32,
 	if (spaceKeyPress && MultiSnake.SN.bulletCoolDown <= 0) {
 		MultiSnake.SN.bulletCoolDown = MultiSnake.LAUNCH_WAIT;
 		MultiSnake.SN.launchBullet();
-		
+
 		playLaser();
 
 		//socket.sendMessage('shoot.PLAYER-ID.')
@@ -260,13 +265,57 @@ export function LoopCallback(delta_ms: i32,
 
 			const Shiphit = MultiSnake.SN.bulletArray[i].hitTest(MultiSnake.SN.enemyShip)
 
-			if (Shiphit) { 
-				playExplosion()
+			if (Shiphit) {
+				playExplosion();
+				MultiSnake.SN.enemyShip.explode();
 			}
 			// check if bullet hits other player (I)
 			//playExplosion();
 
 		}
+	}
+
+	for (i = 0; i < MultiSnake.SN.playerShip.trail.length; i += 2) {
+		let hit: bool = MultiSnake.SN.enemyShip.hitTestPoint(
+			MultiSnake.SN.playerShip.trail[i], // x
+			MultiSnake.SN.playerShip.trail[i + 1] // y
+		);
+
+		if (hit) {
+			playExplosion();
+			MultiSnake.SN.enemyShip.explode();
+		}
+	}
+
+	for (i = 0; i < MultiSnake.SN.enemyBulletArray.length; i++) {
+		if (MultiSnake.SN.enemyBulletArray[i].visible == true) {
+			MultiSnake.SN.enemyBulletArray[i].move();
+			MultiSnake.SN.enemyBulletArray[i].draw();
+
+			const Shiphit = MultiSnake.SN.enemyBulletArray[i].hitTest(MultiSnake.SN.playerShip);
+
+			if (Shiphit) {
+				playExplosion();
+				MultiSnake.SN.playerShip.explode();
+			}
+			// check if bullet hits other player (I)
+			//playExplosion();
+
+		}
+	}
+
+
+	for (i = 0; i < MultiSnake.SN.enemyShip.trail.length; i += 2) {
+		let hit: bool = MultiSnake.SN.playerShip.hitTestPoint(
+			MultiSnake.SN.enemyShip.trail[i], // x
+			MultiSnake.SN.enemyShip.trail[i + 1] // y
+		);
+
+		if (hit) {
+			playExplosion();
+			MultiSnake.SN.playerShip.explode();
+		}
+
 	}
 
 	for (i = 0; i < MultiSnake.SN.explosionArray.length; i++) {

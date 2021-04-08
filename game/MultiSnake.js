@@ -30,7 +30,7 @@ var laser = new Audio('/audio/laserSmall_000.ogg')
 var explosion = new Audio('/audio/explosion-hq.mp3')
 
 // Happy music! 😀
-song.play()
+//song.play()
 
 song.loop = true
 
@@ -80,31 +80,31 @@ document.addEventListener('keyup', (event) => {
 
 // Click-to-shoot
 document.onclick = () => {
-    
+
     spaceKeyPress = true
 
 }
 
 // Each frame render runs this function
 function renderFrame() {
-	let delta = 0;
-	if (last_time !== 0) {
-		delta = (new Date().getTime() - last_time);
-	}
-	last_time = new Date().getTime();
+    let delta = 0;
+    if (last_time !== 0) {
+        delta = (new Date().getTime() - last_time);
+    }
+    last_time = new Date().getTime();
 
-	// call the LoopCallback function in the WASM module
-	exports.LoopCallback(delta,
-		leftKeyPress, rightKeyPress,
-		upKeyPress, downKeyPress,
-		spaceKeyPress);
+    // call the LoopCallback function in the WASM module
+    exports.LoopCallback(delta,
+        leftKeyPress, rightKeyPress,
+        upKeyPress, downKeyPress,
+        spaceKeyPress);
 
     // Turn of click-shoot
 
     spaceKeyPress = false
 
-	// requestAnimationFrame calls renderFrame the next time a frame is rendered
-	requestAnimationFrame(renderFrame);
+    // requestAnimationFrame calls renderFrame the next time a frame is rendered
+    requestAnimationFrame(renderFrame);
 }
 
 // Import AssemblyScript WebSocket!
@@ -117,14 +117,14 @@ const ws = require('ws')
 let username
 
 class Binding {
-    
+
     constructor() {
-        
+
         this._exports = null
 
         this.wasmImports = {
-			MultiSnake: {
-				playLaser: () => {
+            MultiSnake: {
+                playLaser: () => {
                     laser.pause()
                     laser.play()
                 },
@@ -141,7 +141,7 @@ class Binding {
                     setTimeout(() => {
 
                         console.log(this._exports.__getString(message))
-                        
+
                         return
 
                     }, 50);
@@ -150,20 +150,20 @@ class Binding {
                 prompt: (message) => {
 
                     username = prompt(this._exports.__getString(message))
-                    
+
                     return this._exports.__newString(username)
 
                 },
                 setTimeoutCall: (pointer, ms) => {
 
                     setTimeout(() => {
-                        
+
                         this._exports.table.get(pointer)()
 
                     }, ms);
 
                 }
-			},
+            },
             WebSocket: {
                 sendPointer: (id, event, pointer) => {
                     if (!sockets[id]) return
@@ -211,15 +211,15 @@ class Binding {
                     }
 
                     sockets.push(socket)
-                    
+
                     return sockets.length - 1
                 },
                 sendWS: (id, message) => {
                     if (sockets[id].ready === false) {
-                        
+
                         sockets[id].cache.push(this._exports.__getString(message))
                         return
-                        
+
                     }
                     sockets[id]['socket'].send(this._exports.__getString(message))
                     return
@@ -227,58 +227,58 @@ class Binding {
                 closeWS: (id, number) => {
                     sockets[id]['socket'].close(number)
                 }
-            }   
+            }
         }
     }
 
     get wasmExports() {
-		return this._exports
-	}
-	set wasmExports(e) {
-		this._exports = e
-	}
+        return this._exports
+    }
+    set wasmExports(e) {
+        this._exports = e
+    }
 }
 
 // the startGame function calls initASWebGLue and instantiates the wasm module
 export function startGame(wasm_file) {
 
-	// load the audio when the game is started.
-	const memory = new WebAssembly.Memory({ initial: 100 }); // linear memory
+    // load the audio when the game is started.
+    const memory = new WebAssembly.Memory({ initial: 100 }); // linear memory
 
-	const bindings = new Binding()
+    const bindings = new Binding()
 
-	var importObject = {
-		...bindings.wasmImports,
-		env: {
-			memory: memory,
-			seed: Date.now,
-		}
-	};
+    var importObject = {
+        ...bindings.wasmImports,
+        env: {
+            memory: memory,
+            seed: Date.now,
+        }
+    };
 
-	initASWebGLue(importObject);
+    initASWebGLue(importObject);
 
-	(async () => {
-		// use WebAssembly.instantiateStreaming in combination with
-		// fetch instead of WebAssembly.instantiate and fs.readFileSync
+    (async () => {
+        // use WebAssembly.instantiateStreaming in combination with
+        // fetch instead of WebAssembly.instantiate and fs.readFileSync
 
         const wasm = await fetch(wasm_file)
 
-		loader.instantiateStreaming(
-			wasm,
-			importObject).then(obj => {
+        loader.instantiateStreaming(
+            wasm,
+            importObject).then(obj => {
 
-            // Set Bindings (WebSocket)
-            bindings.wasmExports = obj.exports
+                // Set Bindings (WebSocket)
+                bindings.wasmExports = obj.exports
 
-            exports = obj.instance.exports;
+                exports = obj.instance.exports;
 
-            console.log('Loader: ', obj.exports)
+                console.log('Loader: ', obj.exports)
 
-            ASWebGLReady(obj, importObject);
+                ASWebGLReady(obj, importObject);
 
-            requestAnimationFrame(renderFrame);
+                requestAnimationFrame(renderFrame);
 
-        })
+            })
 
-	})();
+    })();
 }
